@@ -189,7 +189,7 @@ export const districts: Record<string, string[]> = {
 };
 
 export const coupons = [
-  { code: 'WELCOME10', type: 'percentage' as const, value: 10, minOrderAmount: 500, expiresAt: '2025-12-31' },
-  { code: 'PRINT200', type: 'fixed' as const, value: 200, minOrderAmount: 1000, expiresAt: '2025-12-31' },
-  { code: 'BULK15', type: 'percentage' as const, value: 15, minOrderAmount: 2000, expiresAt: '2025-12-31' },
+  { code: 'WELCOME10', type: 'percentage' as const, value: 10, minOrderAmount: 500, maxDiscount: 500, expiresAt: '2025-12-31' },
+  { code: 'PRINT200', type: 'fixed' as const, value: 200, minOrderAmount: 1000, maxDiscount: undefined, expiresAt: '2025-12-31' },
+  { code: 'BULK15', type: 'percentage' as const, value: 15, minOrderAmount: 2000, maxDiscount: 1000, expiresAt: '2025-12-31' },
 ];
