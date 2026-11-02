@@ -40,11 +40,12 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-[Poppins] font-semibold text-sm mb-4">Quick Links</h4>
             <ul className="space-y-2.5">
-              {['About Us', 'Our Services', 'Portfolio', 'Blog', 'Careers', 'FAQ'].map((link) => (
-                <li key={link}>
-                  <Link to="#" className="text-text-secondary text-sm hover:text-accent transition-colors">{link}</Link>
-                </li>
-              ))}
+              <li><Link to="/about" className="text-text-secondary text-sm hover:text-accent transition-colors">About Us</Link></li>
+              <li><Link to="/services" className="text-text-secondary text-sm hover:text-accent transition-colors">Our Services</Link></li>
+              <li><Link to="/quote" className="text-text-secondary text-sm hover:text-accent transition-colors">Get a Quote</Link></li>
+              <li><Link to="/products" className="text-text-secondary text-sm hover:text-accent transition-colors">Products</Link></li>
+              <li><Link to="/contact" className="text-text-secondary text-sm hover:text-accent transition-colors">Contact Us</Link></li>
+              <li><Link to="/account" className="text-text-secondary text-sm hover:text-accent transition-colors">My Account</Link></li>
             </ul>
           </div>
 

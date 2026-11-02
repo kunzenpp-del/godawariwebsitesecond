@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: #0A1628;
   --color-secondary: #1B2A4A;
@@ -17,12 +19,21 @@
   --color-input-border: #E5E7EB;
   --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
+  
+  /* Light mode colors */
+  --color-light-bg: #FFFFFF;
+  --color-light-surface: #F8FAFC;
+  --color-light-border: #E2E8F0;
+  --color-light-text: #1E293B;
+  --color-light-text-secondary: #64748B;
+  --color-light-text-muted: #94A3B8;
 }
 
 * {
   box-sizing: border-box;
 }
 
+/* Dark mode (default) */
 body {
   font-family: var(--font-body);
   background-color: #0A1628;
@@ -30,6 +41,14 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light mode */
+.light body,
+body.light-mode {
+  background-color: #F8FAFC;
+  color: #1E293B;
 }
 
 h1, h2, h3, h4, h5, h6 {

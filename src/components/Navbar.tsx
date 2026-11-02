@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Heart, User, Search, Menu, X, ChevronDown, Package } from 'lucide-react';
+import { ShoppingCart, Heart, User, Search, Menu, X, ChevronDown, Package, Sun, Moon } from 'lucide-react';
 import { useCartStore, useWishlistStore, useAuthStore } from '../store';
+import { useTheme } from '../context/ThemeContext';
 import { categories } from '../data/mockData';
 
 export default function Navbar() {
@@ -13,6 +14,7 @@ export default function Navbar() {
   const { getItemCount, toggleCart } = useCartStore();
   const { items: wishlistItems } = useWishlistStore();
   const { isAuthenticated, user } = useAuthStore();
+  const { theme, toggleTheme } = useTheme();
   const cartCount = getItemCount();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -25,9 +27,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-primary/95 backdrop-blur-md border-b border-white/5">
+    <nav className="sticky top-0 z-50 bg-primary/95 dark:bg-primary/95 light:bg-white/95 backdrop-blur-md border-b border-white/5 dark:border-white/5 light:border-gray-200">
       {/* Top bar */}
-      <div className="bg-accent/10 border-b border-accent/20">
+      <div className="bg-accent/10 border-b border-accent/20 light:bg-accent/5">
         <div className="max-w-[1440px] mx-auto px-4 py-1.5 flex items-center justify-between text-xs text-text-secondary">
           <span>📞 +977-01-5555555 | ✉️ info@godawariprinting.com</span>
           <span className="hidden md:block">🚚 Free delivery on orders above Rs. 2,000</span>
@@ -91,6 +93,15 @@ export default function Navbar() {
               )}
             </button>
 
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-text-secondary hover:text-accent transition-colors"
+              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
             {/* User */}
             <Link to={isAuthenticated ? '/account' : '/login'} className="hidden sm:flex items-center gap-1 p-2 text-text-secondary hover:text-accent transition-colors">
               <User size={20} />
@@ -150,14 +161,11 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            <Link to="/products" className="text-sm text-text-secondary hover:text-accent transition-colors">All Products</Link>
-            <Link to="/products?new=true" className="text-sm text-text-secondary hover:text-accent transition-colors">New Arrivals</Link>
-            <Link to="/products?bestseller=true" className="text-sm text-text-secondary hover:text-accent transition-colors">Best Sellers</Link>
-            <Link to="/products?sale=true" className="text-sm text-text-secondary hover:text-accent transition-colors flex items-center gap-1">
-              🔥 Flash Sale
-            </Link>
-            <Link to="/bulk-order" className="text-sm text-text-secondary hover:text-accent transition-colors">Bulk Orders</Link>
-            <Link to="/contact" className="text-sm text-text-secondary hover:text-accent transition-colors">Contact</Link>
+            <Link to="/products" className="text-sm text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent transition-colors">All Products</Link>
+            <Link to="/about" className="text-sm text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent transition-colors">About Us</Link>
+            <Link to="/services" className="text-sm text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent transition-colors">Services</Link>
+            <Link to="/quote" className="text-sm text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent transition-colors">Get a Quote</Link>
+            <Link to="/contact" className="text-sm text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent transition-colors">Contact</Link>
           </div>
         </div>
       </div>
@@ -166,12 +174,11 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="lg:hidden bg-secondary border-t border-white/5 animate-fade-in">
           <div className="px-4 py-4 space-y-2">
-            <Link to="/products" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary hover:text-accent">All Products</Link>
-            <Link to="/products?new=true" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary hover:text-accent">New Arrivals</Link>
-            <Link to="/products?bestseller=true" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary hover:text-accent">Best Sellers</Link>
-            <Link to="/products?sale=true" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary hover:text-accent">🔥 Flash Sale</Link>
-            <Link to="/bulk-order" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary hover:text-accent">Bulk Orders</Link>
-            <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary hover:text-accent">Contact</Link>
+            <Link to="/products" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent">All Products</Link>
+            <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent">About Us</Link>
+            <Link to="/services" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent">Services</Link>
+            <Link to="/quote" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent">Get a Quote</Link>
+            <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block py-2 text-text-secondary dark:text-text-secondary light:text-gray-600 hover:text-accent">Contact</Link>
             <hr className="border-white/10" />
             <p className="text-xs text-text-muted uppercase tracking-wider pt-2">Categories</p>
             {categories.slice(0, 6).map((cat) => (

@@ -12,6 +12,9 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SiteController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\AboutController;
+use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\QuoteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +36,22 @@ Route::prefix('site')->group(function () {
     Route::get('/services', [SiteController::class, 'getServices']);
     Route::post('/newsletter/subscribe', [SiteController::class, 'subscribeNewsletter']);
 });
+
+// About Us (Public)
+Route::prefix('about')->group(function () {
+    Route::get('/', [AboutController::class, 'index']);
+    Route::get('/{section}', [AboutController::class, 'show']);
+});
+
+// Contact Info (Public)
+Route::prefix('contact')->group(function () {
+    Route::get('/', [ContactController::class, 'index']);
+    Route::get('/{type}', [ContactController::class, 'show']);
+});
+
+// Quote Requests (Public)
+Route::post('/quotes', [QuoteController::class, 'store']);
+Route::get('/quotes/{id}', [QuoteController::class, 'show']);
 
 // Authentication
 Route::prefix('auth')->group(function () {

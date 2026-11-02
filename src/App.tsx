@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CartSidebar from './components/CartSidebar';
@@ -15,14 +16,18 @@ import AccountPage from './pages/AccountPage';
 import AdminPage from './pages/AdminPage';
 import WishlistPage from './pages/WishlistPage';
 import ContactPage from './pages/ContactPage';
+import AboutPage from './pages/AboutPage';
+import ServicesPage from './pages/ServicesPage';
+import QuotePage from './pages/QuotePage';
 import { useAuthStore } from './store';
 
 function App() {
   const { user } = useAuthStore();
 
   return (
+    <ThemeProvider>
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col bg-primary">
+      <div className="min-h-screen flex flex-col bg-primary dark:bg-primary light:bg-[#F8FAFC]">
         <Navbar />
         <CartSidebar />
         <main className="flex-1">
@@ -37,7 +42,10 @@ function App() {
             <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <LoginPage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/bulk-order" element={<ContactPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/quote" element={<QuotePage />} />
+            <Route path="/bulk-order" element={<QuotePage />} />
           </Routes>
         </main>
         <Footer />
@@ -71,6 +79,7 @@ function App() {
         />
       </div>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
