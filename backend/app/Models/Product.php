@@ -8,13 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Laravel\Scout\Searchable;
 
-class Product extends Model implements HasMedia
+class Product extends Model
 {
-    use HasFactory, SoftDeletes, InteractsWithMedia, Searchable;
+    use HasFactory, SoftDeletes, Searchable;
 
     protected $fillable = [
         'name',
@@ -31,6 +29,7 @@ class Product extends Model implements HasMedia
         'is_best_seller',
         'is_featured',
         'is_active',
+        'images',        // Added images to mass-assignable properties
         'variants',
         'bulk_pricing',
         'specifications',
@@ -50,6 +49,7 @@ class Product extends Model implements HasMedia
         'is_best_seller' => 'boolean',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
+        'images' => 'array',         // Added explicit array casting for native file uploads
         'variants' => 'array',
         'bulk_pricing' => 'array',
         'specifications' => 'array',
@@ -82,8 +82,15 @@ class Product extends Model implements HasMedia
     // Accessors
     public function getImagesAttribute(): array
     {
-        return $this->getMedia('products')->map(function ($media) {
-            return $media->getUrl();
+        // Fetch raw images JSON/Array from native column fallback safely to an array
+        $images = $this->attributes['images'] ?? '[]';
+        $imagesArray = is_string($images) ? json_decode($images, true) : $images;
+
+        return collect($imagesArray ?? [])->map(function ($imagePath) {
+            // Automatically append public asset path storage link structure
+            return filter_var($imagePath, FILTER_VALIDATE_URL) 
+                ? $imagePath 
+                : asset('storage/' . $imagePath);
         })->toArray();
     }
 

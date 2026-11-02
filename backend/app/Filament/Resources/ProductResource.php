@@ -103,14 +103,13 @@ class ProductResource extends Resource
                     ->columnSpanFull(),
             ]),
 
-            Forms\Components\Section::make('Images')->schema([
-                Forms\Components\SpatieMediaLibraryFileUpload::make('images')
-                    ->collection('products')
-                    ->multiple()
-                    ->image()
-                    ->imageEditor()
-                    ->columnSpanFull(),
-            ]),
+           Forms\Components\Section::make('Images')->schema([
+    Forms\Components\FileUpload::make('images') // <-- Using standard native FileUpload component now
+        ->multiple()
+        ->image()
+        ->imageEditor()
+        ->columnSpanFull(),
+]),
         ]);
     }
 
@@ -118,8 +117,8 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
-                    ->collection('products')
+                Tables\Columns\ImageColumn::make('image')
+                    
                     ->circular(),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category.name')->sortable(),

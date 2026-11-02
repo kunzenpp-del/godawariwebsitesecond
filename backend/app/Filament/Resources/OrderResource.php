@@ -22,6 +22,7 @@ class OrderResource extends Resource
         return $form->schema([
             Forms\Components\Section::make('Order Details')->schema([
                 Forms\Components\TextInput::make('order_number')
+                    ->placeholder('Automatically Generated')
                     ->disabled()
                     ->columnSpan(1),
                 Forms\Components\Select::make('status')
@@ -33,6 +34,7 @@ class OrderResource extends Resource
                         'cancelled' => 'Cancelled',
                         'refunded' => 'Refunded',
                     ])
+                    ->default('pending')
                     ->required(),
                 Forms\Components\Select::make('payment_status')
                     ->options([
@@ -41,45 +43,92 @@ class OrderResource extends Resource
                         'failed' => 'Failed',
                         'refunded' => 'Refunded',
                     ])
+                    ->default('pending')
+                    ->required(),
+                Forms\Components\Select::make('payment_method')
+                    ->options([
+                        'cod' => 'Cash on Delivery',
+                        'esewa' => 'eSewa',
+                        'khalti' => 'Khalti',
+                        'bank_transfer' => 'Bank Transfer',
+                    ])
+                    ->default('cod')
                     ->required(),
                 Forms\Components\TextInput::make('tracking_number')
                     ->maxLength(255),
             ])->columns(2),
 
             Forms\Components\Section::make('Customer Information')->schema([
-                Forms\Components\TextInput::make('shipping_full_name')->disabled(),
-                Forms\Components\TextInput::make('shipping_phone')->disabled(),
-                Forms\Components\TextInput::make('shipping_email')->disabled(),
-                Forms\Components\TextInput::make('shipping_province')->disabled(),
-                Forms\Components\TextInput::make('shipping_district')->disabled(),
-                Forms\Components\TextInput::make('shipping_city')->disabled(),
-                Forms\Components\TextInput::make('shipping_ward')->disabled(),
-                Forms\Components\TextInput::make('shipping_street')->disabled(),
+                Forms\Components\TextInput::make('shipping_full_name')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('shipping_phone')
+                    ->required()
+                    ->maxLength(20),
+                Forms\Components\TextInput::make('shipping_email')
+                    ->email()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('shipping_province')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('shipping_district')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('shipping_city')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('shipping_ward')
+                    ->required()
+                    ->maxLength(50),
+                Forms\Components\TextInput::make('shipping_street')
+                    ->required()
+                    ->maxLength(255),
             ])->columns(2),
 
             Forms\Components\Section::make('Financial Details')->schema([
                 Forms\Components\TextInput::make('subtotal')
-                    ->disabled()
-                    ->prefix('Rs.'),
-                Forms\Components\TextInput::make('discount')
-                    ->disabled()
-                    ->prefix('Rs.'),
-                Forms\Components\TextInput::make('shipping_cost')
-                    ->disabled()
-                    ->prefix('Rs.'),
-                Forms\Components\TextInput::make('total')
-                    ->disabled()
+                    ->numeric()
+                    ->default(0)
                     ->prefix('Rs.')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (Forms\Set $set, Forms\Get $get) => self::updateTotal($set, $get)),
+                Forms\Components\TextInput::make('discount')
+                    ->numeric()
+                    ->default(0)
+                    ->prefix('Rs.')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (Forms\Set $set, Forms\Get $get) => self::updateTotal($set, $get)),
+                Forms\Components\TextInput::make('shipping_cost')
+                    ->numeric()
+                    ->default(0)
+                    ->prefix('Rs.')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (Forms\Set $set, Forms\Get $get) => self::updateTotal($set, $get)),
+                Forms\Components\TextInput::make('total')
+                    ->numeric()
+                    ->default(0)
+                    ->prefix('Rs.')
+                    ->readonly()
                     ->extraAttributes(['class' => 'font-bold text-lg']),
             ])->columns(2),
 
             Forms\Components\Section::make('Notes')->schema([
                 Forms\Components\Textarea::make('notes')
-                    ->disabled()
                     ->rows(3)
                     ->columnSpanFull(),
             ]),
         ]);
+    }
+
+    protected static function updateTotal(Forms\Set $set, Forms\Get $get): void
+    {
+        $subtotal = floatval($get('subtotal') ?? 0);
+        $discount = floatval($get('discount') ?? 0);
+        $shipping = floatval($get('shipping_cost') ?? 0);
+        
+        $total = max(0, ($subtotal + $shipping) - $discount);
+        
+        $set('total', $total);
     }
 
     public static function table(Table $table): Table
@@ -89,28 +138,33 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('order_number')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user.name')
+                Tables\Columns\TextColumn::make('shipping_full_name')
                     ->label('Customer')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total')
                     ->money('NPR')
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'primary' => 'processing',
-                        'info' => 'shipped',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
-                    ]),
-                Tables\Columns\BadgeColumn::make('payment_status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'paid',
-                        'danger' => 'failed',
-                    ]),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'processing' => 'primary',
+                        'shipped' => 'info',
+                        'delivered' => 'success',
+                        'cancelled', 'refunded' => 'danger',
+                        default => 'secondary',
+                    }),
+                Tables\Columns\TextColumn::make('payment_status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'paid' => 'success',
+                        'failed', 'refunded' => 'danger',
+                        default => 'secondary',
+                    }),
                 Tables\Columns\TextColumn::make('payment_method')
-                    ->uppercase(),
+                    ->badge()
+                    ->color('secondary'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
@@ -131,16 +185,6 @@ class OrderResource extends Resource
                         'khalti' => 'Khalti',
                         'bank_transfer' => 'Bank Transfer',
                     ]),
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\DatePicker::make('from'),
-                        Forms\Components\DatePicker::make('until'),
-                    ])
-                    ->query(function ($query, array $data) {
-                        return $query
-                            ->when($data['from'], fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['until'], fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
-                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

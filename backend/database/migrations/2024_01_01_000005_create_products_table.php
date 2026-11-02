@@ -36,7 +36,7 @@ return new class extends Migration
 
             $table->index(['category_id', 'is_active']);
             $table->index(['is_new', 'is_best_seller', 'is_featured']);
-            $table->fullTextIndex(['name', 'description', 'short_description']);
+            $table->fullText(['name', 'description', 'short_description']);
         });
 
         // Product Images
